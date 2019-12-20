@@ -1,0 +1,25 @@
+safe:
+
+./IC3 -v -s < ./example/brp.aig
+
+./IC3 -v -s < ./example/hwmcc19-single-benchmarks/aig/mann/safe/analog_estimation_convergence.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/nusmvguidancep1.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/nusmvreactorp3.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/nusmvtcasp3.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/eijks386.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/pj2016.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/texaspimainp01.aig
+
+unsafe:
+
+./IC3 -v -s < ./example/hwmcc19-single-benchmarks/aig/goel/opensource/h_b05/h_b05.aig
+
+./IC3 -v -s < ./example/hwmcc19-single-benchmarks/aig/goel/opensource/usb_phy/usb_phy.aig
+
+./IC3 -v -s < ./example/hwmcc17-single-benchmarks/ringp0.aig

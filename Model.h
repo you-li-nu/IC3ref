@@ -123,6 +123,14 @@ public:
     return vars[v];
   }
 
+  string stringOfLitVec(LitVec lv) const {
+    stringstream ss;
+    for (Minisat::Lit& lit: lv){
+        ss << stringOfLit(lit) << " ";
+    }
+    return ss.str();
+  }
+
   // Returns the name of the Minisat::Lit.
   string stringOfLit(Minisat::Lit lit) const {
     stringstream ss;
@@ -210,6 +218,44 @@ public:
   // Use this method to allow the Model to decide how best to decide
   // if a cube has an initial state.
   bool isInitial(const LitVec & latches);
+  
+  void printInit() {//youl
+    // A CubeSet is a set of ordered (by integer value) vectors of
+    // Minisat::Lits.
+    cout << "Init cond." << endl;
+    for (LitVec::const_iterator i = init.begin(); i != init.end(); ++i) {
+        if (sign(*i)) {
+            cout << "~";
+        }
+        cout << var((*i)) << " ";
+    }
+    cout << endl;
+  }
+  /*
+  
+  void printClause(LitVec c) {//youl
+    // A CubeSet is a set of ordered (by integer value) vectors of
+    // Minisat::Lits.
+    LitVec::const_iterator i = c.begin();
+    for (unsigned j = 0; j != (*i).size(); ++j) {
+        if (sign((*i)[j])) {
+            cout << "~";
+        }
+        cout << var((*i)[j]) << " ";
+    }
+    cout << endl;
+    }
+    * */
+    
+  const static void printLit(Minisat::Lit l) {//youl
+    // A CubeSet is a set of ordered (by integer value) vectors of
+    // Minisat::Lits.
+    cout << "print lit:" << endl;
+    if (sign(l)) {
+        cout << "~";
+    }
+    cout << var(l) << " " << endl;
+    }
 
 private:
   VarVec vars;

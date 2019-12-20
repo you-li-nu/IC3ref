@@ -174,12 +174,17 @@ void Model::loadTransitionRelation(Minisat::Solver & slv, bool primeConstraints)
       slv.addClause(primeLit(*i));
 }
 
+
 void Model::loadInitialCondition(Minisat::Solver & slv) const {
-  slv.addClause(btrue());
-  for (LitVec::const_iterator i = init.begin(); i != init.end(); ++i)
+  //slv.addClause(btrue());//youl
+  //slv.addClause(bfalse());//youl
+  for (LitVec::const_iterator i = init.begin(); i != init.end(); ++i) {
     slv.addClause(*i);
-  if (constraints.empty())
+    //printLit(*i);
+  }
+  if (constraints.empty()) {
     return;
+  }
   // impose invariant constraints on initial states (AIGER 1.9)
   LitSet require;
   require.insert(constraints.begin(), constraints.end());
@@ -226,8 +231,14 @@ bool Model::isInitial(const LitVec & latches) {
     if (initLits.empty())
       initLits.insert(init.begin(), init.end());
     for (LitVec::const_iterator i = latches.begin(); i != latches.end(); ++i)
-      if (initLits.find(~*i) != initLits.end())
+      if (initLits.find(~*i) != initLits.end()) {
+        //cout << "is initial: false" << endl;
         return false;
+      }
+    //cout << "is initial: true" << endl;
+    //return false;//kaiyu
+    cout << "should not return true!" << endl;//kaiyu
+    //assert(false);//kaiyu
     return true;
   }
   else {
@@ -293,11 +304,23 @@ Model * modelFromAiger(aiger * aig, unsigned int propertyIndex) {
     const Var & latch = vars[1+aig->num_inputs+i];
     // initial condition
     unsigned int r = aig->latches[i].reset;
-    if (r < 2)
-      init.push_back(latch.lit(r == 0));
+    if (r < 2) {
+      init.push_back(latch.lit(r == 0));//kaiyu
+      //init.push_back(Minisat::mkLit(var(latch.lit(r == 0)), true));//kaiyu
+      //init.push_back(Minisat::mkLit(var(latch.lit(r == 0)), false));//kaiyu
+      
+      //if (Minisat::sign(latch.lit(r == 0))) cout << "~";//youl
+      //cout << Minisat::var(latch.lit(r == 0)) << " ";//youl
+      //init.push_back(~latch.lit(r == 0));
+      //if (Minisat::sign(~latch.lit(r == 0))) cout << "~";//youl
+      //cout << Minisat::var(~latch.lit(r == 0)) << " ";//youl
+      //init.push_back(Minisat::mkLit(vars[0].var(), false));//youl
+    }
     // next-state function
     nextStateFns.push_back(lit(vars, aig->latches[i].next));
   }
+  //init.push_back(Minisat::mkLit(vars[1].var(), true));//youl
+  //init.push_back(Minisat::mkLit(vars[1].var(), false));//youl
 
   // invariant constraints
   for (size_t i = 0; i < aig->num_constraints; ++i)

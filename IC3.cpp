@@ -311,7 +311,7 @@ namespace IC3 {
           fr.consecution->random_seed = rand();
           fr.consecution->rnd_init_act = true;
         }
-        if (fr.k == 0) model.loadInitialCondition(*fr.consecution);
+        if (fr.k == 0) model.loadInitialCondition(*fr.consecution);//youl
         model.loadTransitionRelation(*fr.consecution);
       }
     }
@@ -447,7 +447,8 @@ namespace IC3 {
 
     // Checks if cube contains any initial states.
     bool initiation(const LitVec & latches) {
-      return !model.isInitial(latches);
+      bool res = !model.isInitial(latches);//youl
+      return res;
     }
 
     // Check if ~latches is inductive relative to frame fi.  If it's
@@ -499,12 +500,19 @@ namespace IC3 {
         }
         for (LitVec::const_iterator i = latches.begin(); 
              i != latches.end(); ++i)
-          if (fr.consecution->conflict.has(~model.primeLit(*i)))
+          if (fr.consecution->conflict.has(~model.primeLit(*i))) {
             core->push_back(*i);
-        if (!initiation(*core))
+            cout << "in conflict." << endl;//kaiyu
+          }
+          else
+            cout << "not in conflict." << endl;//kaiyu
+        if (!initiation(*core)) {
+          //cout << "initiation failed." << endl;//kaiyu
           *core = latches;
+        }
       }
       fr.consecution->releaseVar(~act);
+      cout << "consecution true." << endl;//kaiyu
       return true;
     }
 
@@ -639,6 +647,8 @@ namespace IC3 {
                  bool silent = false)
     {
       sort(cube.begin(), cube.end());
+      cout << "Cube Size: " << cube.size() << "\tlevel: " << level << endl; // kaiyu
+      
       pair<CubeSet::iterator, bool> rv = frames[level].borderCubes.insert(cube);
       if (!rv.second) return;
       if (!silent && verbose > 1) 
@@ -666,9 +676,11 @@ namespace IC3 {
 
     size_t cexState;  // beginning of counterexample trace
 
-    // Process obligations according to priority.
+
+// Process obligations according to priority.
     bool handleObligations(PriorityQueue obls) {
       while (!obls.empty()) {
+        //cout << "process obil." << endl;//kaiyu
         PriorityQueue::iterator obli = obls.begin();
         Obligation obl = *obli;
         LitVec core;
@@ -676,10 +688,19 @@ namespace IC3 {
         // Is the obligation fulfilled?
         if (consecution(obl.level, state(obl.state).latches, obl.state, 
                         &core, &predi)) {
+          cout << "core size: " << core.size() << endl; // kaiyu
+          cout << "core: " << model.stringOfLitVec(core) << endl; // kaiyu
           // Yes, so generalize and possibly produce a new obligation
           // at a higher level.
           obls.erase(obli);
-          size_t n = generalize(obl.level, core);
+          size_t n = k + 1;//kaiyu
+          n = generalize(obl.level, core);//haizhou
+          /*
+          if (obl.level != 0 || obl.level != 1) {
+            n = generalize(obl.level, core);
+          }
+          * */
+          
           if (n <= k)
             obls.insert(Obligation(obl.state, n, obl.depth));
         }
@@ -696,6 +717,95 @@ namespace IC3 {
       }
       return true;
     }
+
+
+// Process obligations according to priority.
+/*
+    bool handleObligations(PriorityQueue obls) {
+      while (!obls.empty()) {
+        PriorityQueue::iterator obli = obls.begin();
+        Obligation obl = *obli;
+        LitVec core;
+        size_t predi;
+        // Is the obligation fulfilled?
+        if (consecution(obl.level, state(obl.state).latches, obl.state, 
+                        &core, &predi)) {
+          // Yes, so generalize and possibly produce a new obligation
+          // at a higher level.
+          obls.erase(obli);
+          size_t n = generalize(obl.level, core);
+          if (n <= k)
+            obls.insert(Obligation(obl.state, n, obl.depth));
+        }
+        else if (obl.level == 1) {
+          //No, in fact an initial state is a predecessor.
+          //cexState = predi;
+          //return false;
+          
+          //obls.erase(obli);
+          //size_t n = generalize(obl.level - 1, core);
+          size_t n = generalize(obl.level, core);
+          if (n <= k) {
+            obls.insert(Obligation(obl.state, n, obl.depth));
+          }
+        }
+        else {
+          ++nCTI;  // stats
+          // No, so focus on predecessor.
+          obls.insert(Obligation(predi, obl.level-1, obl.depth+1));
+        }
+      }
+      return true;
+    }
+    * */
+    
+    /*
+    
+    // Process obligations according to priority.
+    bool handleObligations(PriorityQueue obls) {
+      while (!obls.empty()) {
+        cout << "handleObligations" << endl;
+        PriorityQueue::iterator obli = obls.begin();
+        Obligation obl = *obli;
+        LitVec core;
+        size_t predi;
+        // Is the obligation fulfilled?
+        bool flag = consecution(obl.level, state(obl.state).latches, obl.state, &core, &predi);
+        if ((obl.level == 1) or flag) {
+          // Yes, so generalize and possibly produce a new obligation
+          // at a higher level.
+          obls.erase(obli);
+          cout << obls.size() << endl;
+          //{continue;}//youl
+          size_t n = 0;
+          n = generalize(obl.level, core);
+          //if (obl.level == 1) {n = 1;}
+          if (n <= k) {
+            obls.insert(Obligation(obl.state, n, obl.depth));
+          }
+        }
+        else if (obl.level == 0) {
+          // No, in fact an initial state is a predecessor.
+          // obls.erase(obli);
+          cexState = predi;
+          return false;
+        }
+        else if (obl.level == 0) {
+          // No, in fact an initial state is a predecessor.
+          break;
+        }
+        else {
+          ++nCTI;  // stats
+          // No, so focus on predecessor.
+          obls.insert(Obligation(predi, obl.level-1, obl.depth+1));
+        }
+      }
+      cout << "return true" << endl;
+      return true;
+    }
+    */
+    
+    
 
     bool trivial;  // indicates whether strengthening was required
                    // during major iteration
@@ -739,7 +849,7 @@ namespace IC3 {
                        all.begin(), all.end(),
                        inserter(rem, rem.end()), LitVecComp());
         if (verbose > 1)
-          cout << i << " " << fr.borderCubes.size() << " " << rem.size() << " ";
+          cout << "borderCubes for frame " << i << ": " << fr.borderCubes.size() << " " << rem.size() << " ";//youl
         fr.borderCubes.swap(rem);
         set_union(rem.begin(), rem.end(),
                   all.begin(), all.end(), 
@@ -772,9 +882,13 @@ namespace IC3 {
           }
         }
         if (verbose > 1)
-          cout << i << " " << ckeep << " " << cprop << " " << cdrop << endl;
-        if (fr.borderCubes.empty())
+          cout << "clause keep, prop, drop: " << i << " " << ckeep << " " << cprop << " " << cdrop << endl;
+        if (fr.borderCubes.empty()) {
+          cout << "printClauses" << endl;//youl
+          printClauses();
+          cout << "empty frame: " << int(i) << endl;
           return true;
+        }
       }
       // 3. simplify frames
       for (size_t i = trivial ? k : 1; i <= k+1; ++i)
@@ -782,6 +896,25 @@ namespace IC3 {
       lifts->simplify();
       return false;
     }
+    
+    void printClauses() {//youl
+    // A CubeSet is a set of ordered (by integer value) vectors of
+    // Minisat::Lits.
+        for (unsigned f = 0; f != frames.size(); ++f) {
+            cout << "frame" << f << ":" << endl;
+            for (CubeSet::const_iterator i = frames[f].borderCubes.begin(); i != frames[f].borderCubes.end(); ++i) {
+                for (unsigned j = 0; j != (*i).size(); ++j) {
+                    if (sign((*i)[j])) {
+                        cout << "~";
+                    }
+                    cout << var((*i)[j]) << " ";
+                }
+                cout << endl;
+            }
+        }
+    }
+    
+
 
     int nQuery, nCTI, nCTG, nmic;
     clock_t startTime, satTime;
@@ -826,14 +959,21 @@ namespace IC3 {
     model.loadError(*base0);
     bool rv = base0->solve(model.error());
     delete base0;
-    if (rv) return false;
+    
+    if (rv) {
+        cout << "kaiyu0" << endl;//kaiyu
+        return false;
+    }
 
     Minisat::Solver * base1 = model.newSolver();
     model.loadInitialCondition(*base1);
     model.loadTransitionRelation(*base1);
     rv = base1->solve(model.primedError());
     delete base1;
-    if (rv) return false;
+    if (rv) {
+        cout << "kaiyu1" << endl;//kaiyu
+        return false;
+    }
 
     model.lockPrimes();
 

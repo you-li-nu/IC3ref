@@ -1,0 +1,15 @@
+IC3.cpp:
+
+1. handleObligations()
+  else if (obl.level == 0) {
+    // No, in fact an initial state is a predecessor.
+    cexState = predi;
+    return false;
+  }
+
+2. initiation()
+
+3. extend()
+  if (fr.k == 0) model.loadInitialCondition(*fr.consecution);
+
+

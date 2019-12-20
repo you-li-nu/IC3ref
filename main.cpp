@@ -32,6 +32,26 @@ extern "C" {
 #include "Model.h"
 
 int main(int argc, char ** argv) {
+  /*
+  vector<Minisat::Lit> init;
+  Minisat::Solver * slv = new Minisat::Solver();
+  // load all variables to maintain alignment
+  for (size_t i = 0; i < 3; ++i) {
+    Minisat::Var nv = slv->newVar();
+  }
+  
+  slv->addClause(Minisat::mkLit(0, false));
+  slv->addClause(Minisat::mkLit(1, false));
+  slv->addClause(Minisat::mkLit(2, true));
+  slv->addClause(Minisat::mkLit(2, false));
+  bool rvv = slv->solve();
+  cout << rvv << endl;
+  
+  //init.push_back(Minisat::mkLit(vars[0].var(), false));
+
+
+  return 0;//kaiyu
+  * */
   unsigned int propertyIndex = 0;
   bool basic = false, random = false;
   int verbose = 0;
@@ -72,6 +92,7 @@ int main(int argc, char ** argv) {
   bool rv = IC3::check(*model, verbose, basic, random);
   // print 0/1 according to AIGER standard
   cout << !rv << endl;
+  model->printInit();//youl
 
   delete model;
 
