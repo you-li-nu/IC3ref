@@ -236,7 +236,7 @@ bool Model::isInitial(const LitVec & latches) {
         return false;
       }
     //cout << "is initial: true" << endl;
-    //return false;//kaiyu
+    return false;//kaiyu
     cout << "should not return true!" << endl;//kaiyu
     //assert(false);//kaiyu
     return true;

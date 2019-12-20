@@ -679,6 +679,7 @@ namespace IC3 {
 
 // Process obligations according to priority.
     bool handleObligations(PriorityQueue obls) {
+      cout << "call handleObligations." << endl; // kaiyu
       while (!obls.empty()) {
         //cout << "process obil." << endl;//kaiyu
         PriorityQueue::iterator obli = obls.begin();
@@ -694,12 +695,12 @@ namespace IC3 {
           // at a higher level.
           obls.erase(obli);
           size_t n = k + 1;//kaiyu
-          n = generalize(obl.level, core);//haizhou
-          /*
-          if (obl.level != 0 || obl.level != 1) {
+          //n = generalize(obl.level, core);//haizhou
+          
+          if (obl.level != 0 && obl.level != 1) {
             n = generalize(obl.level, core);
           }
-          * */
+          
           
           if (n <= k)
             obls.insert(Obligation(obl.state, n, obl.depth));
